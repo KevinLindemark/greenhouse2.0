@@ -12,8 +12,8 @@ from matplotlib.figure import Figure
 import base64
 from io import BytesIO
 
-LED_GPIO_RED = 13
-LED_GPIO_BLUE = 12
+LED_GPIO_RED = 12
+LED_GPIO_BLUE = 13
 PUMP_GPIO = 17
 
 pi = pigpio.pi()
@@ -23,6 +23,7 @@ pi.set_PWM_frequency(LED_GPIO_BLUE, 40000)
 pi.set_PWM_range(LED_GPIO_BLUE, 100) 
 pi.set_PWM_dutycycle(LED_GPIO_BLUE, 0)
 pi.set_PWM_dutycycle(LED_GPIO_RED, 0)
+
 app = Flask(__name__)
 socketio = SocketIO(app)
 

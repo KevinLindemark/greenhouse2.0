@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block title %}
-site 1
+manuel lys
 {% endblock %}
 {% block content %}
 <p>site 1</p>
 <h2>Skru på lyset</h2>
-<input oninput="skru_roed()" type="range" min="0" max="100" id="lysstyrke_r"/>
-<input oninput="skru_blaa()" type="range" min="0" max="100" id="lysstyrke_b"/>
+rød<input oninput="skru_roed()" type="range" min="0" max="100" id="lysstyrke_r"/>
+ blå <input oninput="skru_blaa()" type="range" min="0" max="100" id="lysstyrke_b"/>
 <script>
     var socket = io();
     function skru_roed() {
