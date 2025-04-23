@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}
+LDR live
+{% endblock %}
+{% block content %}
+<h2>LDR lys</h2>
+LDR lys ADC værdi : <span id="ldr"></span><br />
+
+<script>
+    var socket = io();
+    socket.emit('hent_ldr')
+    socket.on('ldr', function(data) {
+        console.log(data)
+            document.getElementById('ldr').innerText = data["ldr"]
+        socket.emit('hent_ldr')
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}
+soil
+{% endblock %}
+{% block content %}
+<p>Soil moisture</p>
+<img class="img-fluid float-left" src='data:image/png;base64,{{soil_data}}'/>
+
+{% endblock %}

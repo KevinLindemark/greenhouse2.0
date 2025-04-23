@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}
+site 1
+{% endblock %}
+{% block content %}
+<p>site 1</p>
+<h2>Skru på lyset</h2>
+<input oninput="skru_roed()" type="range" min="0" max="100" id="lysstyrke_r"/>
+<input oninput="skru_blaa()" type="range" min="0" max="100" id="lysstyrke_b"/>
+<script>
+    var socket = io();
+    function skru_roed() {
+        socket.emit('skru_roed',
+        {
+            'lysstyrke_roed' : document.getElementById('lysstyrke_r').value
+        })
+    }
+
+    function skru_blaa() {
+        socket.emit('skru_blaa',
+        {
+            'lysstyrke_blaa' : document.getElementById('lysstyrke_b').value
+        })
+    }
+</script>
+{% endblock %}

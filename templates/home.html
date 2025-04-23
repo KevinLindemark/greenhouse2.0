@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}
+Home
+{% endblock %}
+{% block content %}
+<p>Home site</p>
+Latest image here:
+<br>
+<img src= "../static/img/{{image}}">
+<br>
+<button><a href="{{url_for('take_photo')}}">Take photo</a></button>
+{% endblock %}

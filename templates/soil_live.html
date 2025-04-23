@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}
+site 2
+{% endblock %}
+{% block content %}
+<p>jordfugtighed</p>
+<h2>Jorfugtighed og pumpe til vanding</h2>
+jordfugtighed : <span id="jordfugtighed"></span>%<br />
+Pumpen kører : <span id="pump_status"></span><br />
+
+<script>
+    var socket = io();
+    socket.emit('hent_soil')
+    socket.on('soil', function(data) {
+        console.log(data)
+            document.getElementById('jordfugtighed').innerText = data["moist_percentage"]
+            document.getElementById('pump_status').innerText = data["pump_state"] == 1 ? "ja" : "nej";
+        socket.emit('hent_soil')
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}
+site 2
+{% endblock %}
+{% block content %}
+<p>site 2</p>
+<h2>Temperatur og fugtighed</h2>
+Temperatur : <span id="temperatur"></span><br />
+Fugtighed : <span id="fugtighed"></span><br />
+<script>
+    var socket = io();
+
+    socket.emit('hent_temp')
+
+    socket.on('temp', function(data) {
+        console.log( data['valid']  )
+        if (data != 'None' && data['valid'] == true) {
+            document.getElementById('temperatur').innerText = data['temp_c']
+            document.getElementById('fugtighed').innerText = data['humidity']
+        }
+        socket.emit('hent_temp')
+    })
+</script>
+{% endblock %}
