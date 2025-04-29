@@ -211,7 +211,9 @@ def take_photo():
 
 @app.route("/predict_last_photo/")
 def predict_last_photo():
+    # hent sidste billede
     last_photo = select_images(1)[0][0]
+    # prediction på sidste billede
     prediction(last_photo)
     # laver et redirect tilbage til home når billedet er taget
     return redirect(url_for("home"))
