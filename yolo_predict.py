@@ -14,9 +14,9 @@ def copy_and_rename_pathlib(src_path, dest_path, new_name):
 def prediction(img):
     model = YOLO('yolo11n.pt')
     timestamp_jpg = img
-    timestamp = img[:-4]
-    img = f"static/img/{img}"
-    save_location = "static/img/predictions" # mappe hvor billede skal gemmes
+    timestamp = img[:-4] # fjerne .jpg fra string for at få timestamp
+    img = f"static/img/{img}" # path til originale billede
+    save_location = "static/img/predictions" # mappe hvor predicted billede skal gemmes
     result = model.predict(img, save=True, imgsz=640, conf=0.4, iou=0.3, project=save_location, name=timestamp)
     
     r = result[0] # få det første resultat som liste med Result objekter

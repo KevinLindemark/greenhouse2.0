@@ -7,6 +7,9 @@ Home
 Latest image here:
 <br>
 <img src= "../static/img/{{image}}">
+{% if request.args.get("predicted") == "True" %}
+<img src= "../static/img/predictions/{{image}}">
+{% endif %}
 <br>
 <button><a href="{{url_for('take_photo')}}">Take photo</a></button>
 <button><a href="{{url_for('predict_last_photo')}}">predict photo</a></button>

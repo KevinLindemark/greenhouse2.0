@@ -103,7 +103,7 @@ class SoilMoist:
 
     def insert_soilmoisture(self):
         date_time = datetime.now()
-        timestamp = f"{date_time.strftime('%d-%m-%Y-%H:%M:%S')}"
+        timestamp = f"{date_time.strftime('%d-%m-%Y-%H-%M-%S')}"
         con = Connection('greenhouse.db')
         cur = con.cursor()
         moisture_percentage = self.soil_percent()
@@ -161,16 +161,17 @@ def skru_blaa(data):
     pi.set_PWM_dutycycle(LED_GPIO_BLUE, lysstyrke_blaa)
 
 
-def select_images(amount):
+def select_images(amount, table="Images"):
     if isinstance(amount, int) and amount > 0:
-        con = Connection('greenhouse.db')
-        cur = con.cursor()
-        sql = f"""SELECT timestamp_jpg FROM Images ORDER BY rowid DESC LIMIT {amount}"""
-        cur.execute(sql)
-        img_rows = cur.fetchall()
-        print(img_rows)
-        con.close()
-        return img_rows
+        if table == "Images" or table == "ImagePredictions":
+            con = Connection('greenhouse.db')
+            cur = con.cursor()
+            sql = f"""SELECT timestamp_jpg FROM Images ORDER BY rowid DESC LIMIT {amount}"""
+            cur.execute(sql)
+            img_rows = cur.fetchall()
+            print(img_rows)
+            con.close()
+            return img_rows
 
 def insert_img(timestamp, timestamp_jpg):
     con = Connection('greenhouse.db')
@@ -216,7 +217,7 @@ def predict_last_photo():
     # prediction på sidste billede
     prediction(last_photo)
     # laver et redirect tilbage til home når billedet er taget
-    return redirect(url_for("home"))
+    return redirect(url_for("home", predicted = True)) # argument bruges til at vise predicted billede
 
 @app.route("/")
 def home():
