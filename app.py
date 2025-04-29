@@ -11,19 +11,25 @@ import threading
 from matplotlib.figure import Figure
 import base64
 from io import BytesIO
+from yolo_predict import copy_and_rename_pathlib, prediction
 
 LED_GPIO_RED = 12
 LED_GPIO_BLUE = 13
 PUMP_GPIO = 17
 
 pi = pigpio.pi()
-pi.set_PWM_frequency(LED_GPIO_RED, 40000)
+pi.set_PWM_frequency(LED_GPIO_RED, 10000)
 pi.set_PWM_range(LED_GPIO_RED, 100) 
-pi.set_PWM_frequency(LED_GPIO_BLUE, 40000)
+pi.set_PWM_frequency(LED_GPIO_BLUE, 10000)
 pi.set_PWM_range(LED_GPIO_BLUE, 100) 
 pi.set_PWM_dutycycle(LED_GPIO_BLUE, 0)
 pi.set_PWM_dutycycle(LED_GPIO_RED, 0)
-
+pi.set_mode(LED_GPIO_RED, pigpio.OUTPUT)
+pi.set_mode(LED_GPIO_BLUE, pigpio.OUTPUT)
+if pi.get_PWM_dutycycle(LED_GPIO_RED) > 40 or pi.get_PWM_dutycycle(LED_GPIO_BLUE) > 30:
+    pi.set_PWM_dutycycle(LED_GPIO_RED, 30)
+    pi.set_PWM_dutycycle(LED_GPIO_BLUE, 40)
+    
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -159,38 +165,54 @@ def select_images(amount):
     if isinstance(amount, int) and amount > 0:
         con = Connection('greenhouse.db')
         cur = con.cursor()
-        sql = f"""SELECT timestamp FROM Images ORDER BY rowid DESC LIMIT {amount}"""
+        sql = f"""SELECT timestamp_jpg FROM Images ORDER BY rowid DESC LIMIT {amount}"""
         cur.execute(sql)
         img_rows = cur.fetchall()
         print(img_rows)
         con.close()
         return img_rows
 
-def insert_img(timestamp):
+def insert_img(timestamp, timestamp_jpg):
     con = Connection('greenhouse.db')
     cur = con.cursor()
-    params = (timestamp,)
-    sql = """INSERT INTO Images (timestamp) VALUES(?)"""  
+    params = (timestamp, timestamp_jpg)
+    sql = """INSERT INTO Images (timestamp, timestamp_jpg) VALUES(?, ?)"""  
     cur.execute(sql, params)
     con.commit()
     con.close()
 
 def take_picture():
-    date_time = datetime.now()
-    datetime_img = f"{date_time.strftime('%d-%m-%Y-%H:%M:%S')}.jpg"
+    timestamp = datetime.now().strftime('%d-%m-%Y-%H:%M:%S')
+    timestamp_jpg = f"{timestamp}.jpg"
     picam = Picamera2()
     config = picam.create_preview_configuration(main={"size": (640, 480)})
     config["transform"] = libcamera.Transform(hflip=1, vflip=1)
     picam.configure(config)    
     picam.start()
-    picam.capture_file(f"static/img/{datetime_img}")
+    picam.capture_file(f"static/img/{timestamp_jpg}")
     picam.close()
-    insert_img(datetime_img)
+    insert_img(timestamp, timestamp_jpg)
+
+def insert_prediction(timestamp, timestamp_jpg, summary):
+    con = Connection('greenhouse.db')
+    cur = con.cursor()
+    params = (timestamp, timestamp_jpg, summary)
+    sql = """INSERT INTO Images (timestamp, timestamp_jpg, summary) VALUES(?, ?, ?)"""  
+    cur.execute(sql, params)
+    con.commit()
+    con.close()
 
 @app.route("/take_photo/")
 def take_photo():
     # tager et nyt billede
     take_picture()
+    # laver et redirect tilbage til home når billedet er taget
+    return redirect(url_for("home"))
+
+@app.route("/predict_last_photo/")
+def predict_last_photo():
+    last_photo = select_images(1)[0][0]
+    prediction(last_photo)
     # laver et redirect tilbage til home når billedet er taget
     return redirect(url_for("home"))
 
@@ -257,7 +279,6 @@ def hent_soil():
 @app.route("/ldr_live/")
 def ldr_live():
     return render_template("ldr_live.html", methods=['GET'])
-
 
 if __name__ == ('__main__'):
     app.run(host="0.0.0.0", debug=True)
