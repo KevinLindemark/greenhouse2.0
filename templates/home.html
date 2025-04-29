@@ -7,6 +7,9 @@ Home
 Latest image here:
 <br>
 <img src= "../static/img/{{image}}">
+<!-- Tager parametret fra URL og viser predicted billede hvis værdien
+    er True. Der anvendes en jinja if statement.    
+-->
 {% if request.args.get("predicted") == "True" %}
 <img src= "../static/img/predictions/{{image}}">
 {% endif %}

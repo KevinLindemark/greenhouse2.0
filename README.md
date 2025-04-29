@@ -8,5 +8,9 @@
 
 
 
-
+TODO:
+- make it start faster
+- add scheduler for light and pump
+- add system_d to start everything at boot and restart services
+- add more error handling
 

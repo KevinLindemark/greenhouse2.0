@@ -96,9 +96,7 @@ class SoilMoist:
             data = round(percentage, 2)
             if percentage < 0:
                 data = 0
-        if data < 10:
-            ...
-            #print(f"Soil is dry and at {data}% moisture!")
+
         return data
 
     def insert_soilmoisture(self):
@@ -260,7 +258,6 @@ def manual_light():
 
 @socketio.on('hent_soil')
 def hent_soil():
-    print(soil_measure.soil_moisture_percent)
     sleep(0.5)
     data = {"moist_percentage":soil_measure.soil_moisture_percent,
             "pump_state": soil_measure.water_pump.pump_running
@@ -282,6 +279,21 @@ def hent_soil():
 @app.route("/ldr_live/")
 def ldr_live():
     return render_template("ldr_live.html", methods=['GET'])
+
+@socketio.on('start_pump')
+def start_pump():
+    try:
+        print("Starting pump for 1 second")
+        data = {"pump_state": True}
+        socketio.emit('pump', data)
+        soil_measure.water_pump.water_plants(1)
+        data = {"pump_state": False}
+        socketio.emit('pump', data)
+        # the pump gives aproximately 200 mililiters of water per 10 seconds
+        print("Stopped pump again!")
+    except:
+        print("Something went wrong, stopping pump")
+        pi.write(PUMP_GPIO, 0)
 
 if __name__ == ('__main__'):
     app.run(host="0.0.0.0", debug=True)

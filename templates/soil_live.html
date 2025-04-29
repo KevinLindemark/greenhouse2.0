@@ -7,7 +7,7 @@ site 2
 <h2>Jorfugtighed og pumpe til vanding</h2>
 jordfugtighed : <span id="jordfugtighed"></span>%<br />
 Pumpen kører : <span id="pump_status"></span><br />
-
+<button onclick="give_water()">Water the plants!</button>
 <script>
     var socket = io();
     socket.emit('hent_soil')
@@ -17,5 +17,17 @@ Pumpen kører : <span id="pump_status"></span><br />
             document.getElementById('pump_status').innerText = data["pump_state"] == 1 ? "ja" : "nej";
         socket.emit('hent_soil')
     })
+
+    socket.on('pump',
+    function(data){
+      console.log("pump_state " + data)
+      document.getElementById('pump_status').innerText = data["pump_state"] == 1 ? "ja" : "nej";
+    }
+    )
+
+function give_water(){
+    socket.emit("start_pump")
+}
+
 </script>
 {% endblock %}
